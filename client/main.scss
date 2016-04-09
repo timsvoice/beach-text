@@ -1,0 +1,6 @@
+// 3rd Party Scss files
+@import '{}/node_modules/foundation-sites/scss/foundation.scss';
+@include foundation-everything;
+
+// UI scss files
+@import "{}/imports/ui/pages/home.scss"

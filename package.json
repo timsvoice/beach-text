@@ -1,0 +1,15 @@
+{
+  "name": "Appname",
+  "private": false,
+  "scripts": {
+    "start": "meteor -p 8000 --settings imports/startup/server/development/settings.json",
+    "production": "meteor -p 8000 --settings imports/startup/server/production/settings.json"
+  },
+  "dependencies": {
+    "foundation-sites": "^6.2.1"
+  },
+  "devDependencies": {
+    "eslint": "^2.7.0",
+    "eslint-config-airbnb": "^6.2.0"
+  }
+}
