@@ -3,13 +3,18 @@
   "private": false,
   "scripts": {
     "start": "meteor -p 8000 --settings imports/startup/server/development/settings.json",
-    "production": "meteor -p 8000 --settings imports/startup/server/production/settings.json"
+    "production": "meteor -p 8000 --settings imports/startup/server/production/settings.json",
+    "test": "meteor test --driver-package=practicalmeteor:mocha --port 8100 --settings imports/startup/server/development/settings.json"
   },
   "dependencies": {
-    "foundation-sites": "^6.2.1"
+    "foundation-sites": "^6.2.1",
+    "meteor-node-stubs": "^0.2.3"
   },
   "devDependencies": {
     "eslint": "^2.7.0",
-    "eslint-config-airbnb": "^6.2.0"
+    "eslint-config-airbnb": "^6.2.0",
+    "eslint-plugin-react": "^4.3.0",
+    "faker": "^3.1.0",
+    "sinon": "^1.17.3"
   }
 }

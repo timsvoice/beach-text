@@ -9,6 +9,11 @@ standard-minifiers
 es5-shim
 ecmascript
 
+practicalmeteor:mocha
+practicalmeteor:chai
+mdg:validated-method
+dburles:factory
+
 accounts-password
 useraccounts:core
 
@@ -16,4 +21,6 @@ kadira:blaze-layout
 kadira:flow-router
 
 aldeed:collection2
+
 fourseven:scss
+zurb:foundation-sites
