@@ -21,6 +21,7 @@ export const send = new ValidatedMethod({
       from: twilioNumber,
       body: message, 
     });
+    console.log(textResult);
     return textResult;
   },
 });
