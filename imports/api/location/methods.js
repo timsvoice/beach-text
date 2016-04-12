@@ -12,9 +12,9 @@ export const findBeach = new ValidatedMethod({
     const url = 'https://maps.googleapis.com/maps/api/place/textsearch/json?';
     const query = `query=${text}&key=${key}`;
     // create query and parse results
-    const beaches = HTTP.get(url + query);
-    const beachArray = [];
+    const beaches = HTTP.get(url + query).data.results;
 
+    const beachArray = [];
     beaches.forEach((result) => {
       if (beachArray.length > 3) return;
 

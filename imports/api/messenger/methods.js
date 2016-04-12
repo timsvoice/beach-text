@@ -3,7 +3,7 @@ import { ValidatedMethod } from 'meteor/mdg:validated-method';
 import { SimpleSchema } from 'meteor/aldeed:simple-schema';
 
 import twilio from 'twilio';
-import { find } from '../location/methods.js';
+import { findBeach } from '../location/methods.js';
 
 const messenger = twilio(Meteor.settings.TWILIO_ACCOUNT_SID, Meteor.settings.TWILIO_AUTH_TOKEN);
 const twilioNumber = Meteor.settings.TWILIO_NUMBER;
@@ -22,19 +22,16 @@ export const send = new ValidatedMethod({
       from: twilioNumber,
       body: message,
     });
-    console.log(textResult);
     return textResult;
   },
 });
 
-export const findBeach = new ValidatedMethod({
-  name: 'messenger.find.beach',
-  validate: new SimpleSchema({
-    searchText: { type: String },
-  }).validator(),
+export const beachSelect = new ValidatedMethod({
+  name: 'messenger.select.beach',
+  validate: null,
   run({ searchText, messageData }) {
-    const beaches = find.call({ searchText });
-    const beachText = '';
+    const beaches = findBeach.call({ searchText });
+    let beachText = '';
     let response = {};
 
     // set the response message based on
@@ -44,7 +41,7 @@ export const findBeach = new ValidatedMethod({
         response = {
           beaches: beaches.length,
           status: 'failed',
-          message: 'hmmm. I couldn\'t find your beach. got any other ideas',
+          message: 'Hmmm. I couldn\'t find your beach. Got any other ideas',
         };
         break;
       }
@@ -52,7 +49,7 @@ export const findBeach = new ValidatedMethod({
         response = {
           beaches: beaches.length,
           status: 'success',
-          message: 'got one. want me to add ',
+          message: 'Got one. Want me to add ',
         };
         break;
       }
@@ -60,23 +57,21 @@ export const findBeach = new ValidatedMethod({
         response = {
           beaches: beaches.length,
           status: 'success',
-          message: 'cool. I found a few. any of these work: ',
+          message: 'Cool. I found a few. Any of these work: ',
         };
         break;
       }
     }
-
-    // create a numbered string of beaches
-    if (response.status === 'success') {
-      beaches.forEach((beach, index) => {
-        beachText.concat(`#${index + 1} ${beach.name} `);
-      });
-    }
+    // create an array of beaches
+    const beachNamesArray = [];
+    beaches.forEach((beach, index) => {
+      beachNamesArray.push(beach.name);
+    });      
+    const beachNames = beachNamesArray.join(', ');
 
     // create final message to send
-    response.message.concat(beachText).concat(' ?');
-
+    let finalMessage = response.message.concat(beachNames).concat('?');  
     // send the response to the user
-    send.call({ message: response.message, reciepient: messageData.from });
+    send.call({ message: finalMessage, recipient: messageData.from });
   },
 });
