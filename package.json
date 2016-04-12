@@ -7,6 +7,7 @@
     "test": "meteor test --driver-package=practicalmeteor:mocha --port 8100 --settings imports/startup/server/development/settings.json"
   },
   "dependencies": {
+    "fibers": "^1.0.10",
     "forecast.io": "0.0.9",
     "foundation-sites": "^6.2.1",
     "meteor-node-stubs": "^0.2.3",

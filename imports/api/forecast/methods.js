@@ -1,21 +1,23 @@
 import { Meteor } from 'meteor/meteor';
-import { HTTP } from 'meteor/http';
 import { ValidatedMethod } from 'meteor/mdg:validated-method';
-import { _ } from 'underscore';
+import Future from 'fibers/future';
 
 import Forecast from 'forecast.io';
 
 const options = { APIKey: Meteor.settings.FORECAST_KEY };
 const forecast = new Forecast(options);
+const future = new Future();
 
 export const getForecast = new ValidatedMethod({
   name: 'forecast.get',
   validate: null,
-  run({ lat, lng }) {    
-    let forecastCall = Meteor.wrapAsync(forecast.get, forecast);
-    let forecastOptions = { exclude:'minutely,hourly,flags,alerts' };
-    let forecastResult = forecastCall(lat, lng, forecastOptions).body;
-    return forecastResult;
+  run({ lat, lng }) {
+    const forecastOptions = { exclude: 'minutely,flags,alerts' };
+    forecast.get(lat, lng, forecastOptions, (err, res, data) => {
+      if (err) future.return(err);
+      future.return(data);
+    });
+    return future.wait();
   },
 });
 
@@ -23,14 +25,17 @@ export const getBeachForecast = new ValidatedMethod({
   name: 'forecast.beach',
   validate: null,
   run({ lat, lng }) {
-    let forecastResult = getForecast.call({ lat, lng });
-    let beachForecast = {}
+    const data = getForecast.call({ lat, lng });
+    const currentData = data.currently;
+    const hourlyData = data.hourly;
 
-    beachForecast.summary = forecastResult;
-  }
-})
-
-// getBeachForecast.call({
-//   lat: 10.345,
-//   lng: -10.56
-// })
+    const beachForecast = {
+      summary: hourlyData.summary,
+      current: currentData.summary,
+      temperature: currentData.apparentTemperature,
+      cloudCover: currentData.cloudCover,
+      precipProbability: currentData.precipProbability,
+    };
+    return beachForecast;
+  },
+});
