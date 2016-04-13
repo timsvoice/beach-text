@@ -71,7 +71,6 @@ export const beachSelect = new ValidatedMethod({
 
     // create final message to send
     let finalMessage = response.message.concat(beachNames).concat('?');  
-    // send the response to the user
-    send.call({ message: finalMessage, recipient: messageData.from });
+    return finalMessage;
   },
 });
