@@ -10,7 +10,7 @@ import { beachSelect } from '../../api/messenger/methods.js';
 Picker.route( '/feed/me/a/beach', function( params, request, response, next ) {    
   let query = params.query;  
   let beachResponse = beachSelect.call({searchText:query.Body, messageData: { from: query.From }});
-  let body = `<?xml version="1.0" encoding="UTF-8" ?><Response><Message>${_.escape(beachResponse)}</Message></Response>`;
+  let body = `<?xml version="1.0" encoding="UTF-8" ?><Response><Message>${beachResponse}</Message></Response>`;
 
   response.writeHead(200, {
   'Content-Length': body.length,

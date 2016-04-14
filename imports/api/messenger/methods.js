@@ -1,6 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { ValidatedMethod } from 'meteor/mdg:validated-method';
 import { SimpleSchema } from 'meteor/aldeed:simple-schema';
+import { _ } from 'underscore';
 
 import twilio from 'twilio';
 import { findBeach } from '../location/methods.js';
@@ -71,6 +72,6 @@ export const beachSelect = new ValidatedMethod({
 
     // create final message to send
     let finalMessage = response.message.concat(beachNames).concat('?');  
-    return finalMessage;
+    return _.escape(finalMessage);
   },
 });
