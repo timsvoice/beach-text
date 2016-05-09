@@ -12,7 +12,7 @@ export const getForecast = new ValidatedMethod({
   name: 'forecast.get',
   validate: null,
   run({ lat, lng }) {
-    const forecastOptions = { exclude: 'minutely,flags,alerts' };
+    const forecastOptions = { exclude: 'minutely,hourly,flags,alerts' };
     forecast.get(lat, lng, forecastOptions, (err, res, data) => {
       if (err) future.return(err);
       future.return(data);
@@ -24,10 +24,16 @@ export const getForecast = new ValidatedMethod({
 export const getBeachForecast = new ValidatedMethod({
   name: 'forecast.beach',
   validate: null,
-  run({ lat, lng }) {
+  run({ day, lat, lng }) {
     const data = getForecast.call({ lat, lng });
-    const currentData = data.currently;
-    const hourlyData = data.hourly;
+    const dailyData = data.daily.data;
+
+    const data = dailyData.forEach((daily) => {
+      dayName = moment(daily.time).format('dddd').toLowerCase()
+      if (day === dayName) {
+        return daily;
+      }
+    })
 
     const beachForecast = {
       summary: hourlyData.summary,

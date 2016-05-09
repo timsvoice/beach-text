@@ -1,4 +1,5 @@
 import VeRex from 'verbal-expressions';
+import { Peeps } from '../../api/peeps/peeps.js';
 
 const verex = VeRex;
 
@@ -18,12 +19,18 @@ const days = [
 ];
 
 export const knownNumber = ({ From }) => {
-  const knowNumbers = [];
-  if (knowNumbers.indexOf(From)) return true;
+  let knowNumbers = Peeps.findOne({ number: From });
+  if (knowNumbers) return true;
   return false;
 };
 
-export const dayChecker = ({ Body }) => {
+export const beachMatch = ({ Body, From }) => {
+  let response = verex().find('yes').or('yup').or('yah');
+  const beachMatchResponse = response.test(Body);
+  return beachMatchResponse;
+};
+
+export const dayChecker = ({ Body, From }) => {
   // define an array of possible days
   let requestedDay = '';
   days.forEach((day) => {
@@ -47,11 +54,11 @@ export const shortcode = ({ Body }) => {
   return { isShortcode, day };
 };
 
-export const responseGenerator = ({ apparentTemperature, icon }) => {
+export const responseGenerator = ({ apparentTemperature, icon, summary }) => {
   // check apparentTemperature
   const yahConditions = ['clear-day', 'clear-night', 'partly-cloudy-night'];
-  const mehConditions = ['wind', 'fog', 'cloudy', 'partly-cloudy-day'];
-  const nahConditions = ['rain', 'snow', 'sleet'];
+  const mehConditions = ['wind', 'cloudy', 'partly-cloudy-day'];
+  const nahConditions = ['rain', 'snow', 'sleet', 'fog'];
   const allConditions = yahConditions.concat(mehConditions.concat(nahConditions));
 
   const mehWeather = mehConditions.indexOf(icon) !== -1;
@@ -73,5 +80,24 @@ export const responseGenerator = ({ apparentTemperature, icon }) => {
     return 'nah';
   };
 
-  return response(apparentTemperature);
+  switch (response(apparentTemperature)) {
+    case 'nah': {
+      let responseMessage = `Nah, better sit this one out. It's going to be ${icon}, and feel like ${apparentTemp.toFixed()}. Watch a movie or something`
+      break;
+    },
+    case 'meh': {
+      let responseMessage = `Meh, not so good. It's going to be ${icon}, and feel like ${apparentTemp.toFixed()}`
+      break;
+    },
+    case 'yah': {
+      let responseMessage = `Yah, it\'s going to be an awesome beach day! It's going to be ${icon}, and feel like ${apparentTemp.toFixed()} Get out there`
+      break;
+    },
+    default: {
+      let responseMessage = `Nah, better sit this one out. It's going to be ${icon}, and feel like ${apparentTemp.toFixed()}. Watch a movie or something`
+      break;
+    }
+  }
+
+  return responseMessage
 };
