@@ -5,7 +5,7 @@ import { ValidatedMethod } from 'meteor/mdg:validated-method';
 export const findBeach = new ValidatedMethod({
   name: 'find.beach',
   validate: null,
-  run({ Body }) {
+  run({ searchText }) {
     const text = searchText.replace(/ /g, '+');
     // setup query
     const key = Meteor.settings.GOOGLE_KEY;
@@ -31,8 +31,9 @@ export const findBeach = new ValidatedMethod({
 export const beachSelect = new ValidatedMethod({
   name: 'messenger.select.beach',
   validate: null,
-  run({ searchText, messageData }) {
-    const beaches = findBeach.call({ searchText });
+  run({ searchText }) {
+    const beaches = Meteor.call('find.beach', { searchText });
+    console.log('beaches', beaches.length);
     let beachText = '';
     let response = {};
 
@@ -41,7 +42,7 @@ export const beachSelect = new ValidatedMethod({
     switch (beaches.length) {
       case 0: {
         response = {
-          beaches: beaches.length,
+          beaches: beaches[0],
           status: 'failed',
           message: 'Hmmm. I couldn\'t find your beach. Got any other ideas?',
         };
@@ -49,15 +50,15 @@ export const beachSelect = new ValidatedMethod({
       }
       case 1: {
         response = {
-          beaches: beaches.length,
+          beaches: beaches[0],
           status: 'success',
-          message: `Cool. I found ${beaches[0].name}, does that work?`,
+          message: `Cool. I found ${beaches[0].name}. When are you going?`,
         };
         break;
       }
       default: {
         response = {
-          beaches: beaches.length,
+          beaches: beaches[0],
           status: 'failed',
           message: 'Hmmm. I couldn\'t find your beach. Got any other ideas?',
         };
@@ -73,9 +74,9 @@ export const beachSelect = new ValidatedMethod({
 
     // create final message to send
     let finalMessage = {
-      text: response.message,
-      beaches: response.beaches.length,
-    }
-    return _.escape(finalMessage);
+      text: _.escape(response.message),
+      beaches: response.beaches,
+    }    
+    return finalMessage;
   },
 });

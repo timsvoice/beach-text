@@ -1,4 +1,5 @@
 import VeRex from 'verbal-expressions';
+import moment from 'moment';
 import { Peeps } from '../../api/peeps/peeps.js';
 
 const verex = VeRex;
@@ -34,12 +35,31 @@ export const dayChecker = ({ Body, From }) => {
   // define an array of possible days
   let requestedDay = '';
   days.forEach((day) => {
+    const dayRequest = Body.toLowerCase();
     const dayMatch = verex().find(day);
-    if (dayMatch.test(Body)) requestedDay = day;
+    console.log(day);
+    if (dayMatch.test(dayRequest)) {
+      switch (dayRequest) {
+        case 'today':           
+          requestedDay = moment().format('dddd');
+          break;
+        case 'tomorrow':
+          requestedDay = moment().add(1, 'days').format('dddd');
+          break;
+        case 'later':
+          requestedDay = moment().format('dddd');
+          break;
+        case 'now':
+          requestedDay = moment().format('dddd');
+          break;
+        default:
+          requestedDay = day;
+      }
+    }
   });
 
   if (requestedDay.length < 1) return false;
-  return requestedDay;
+  return requestedDay.toLowerCase();
 };
 
 export const shortcode = ({ Body }) => {
@@ -81,22 +101,18 @@ export const responseGenerator = ({ apparentTemperature, icon, summary }) => {
   };
 
   switch (response(apparentTemperature)) {
-    case 'nah': {
-      let responseMessage = `Nah, better sit this one out. It's going to be ${icon}, and feel like ${apparentTemp.toFixed()}. Watch a movie or something`
+    case 'nah':
+      let responseMessage = `Nah, better sit this one out. It's going to be ${summary} It\'s going to feel like ${apparentTemperature.min}. Watch a movie or something`
       break;
-    },
-    case 'meh': {
-      let responseMessage = `Meh, not so good. It's going to be ${icon}, and feel like ${apparentTemp.toFixed()}`
+    case 'meh':
+      responseMessage = `Meh, not so good. It's going to be ${summary} It\'s going to feel like ${apparentTemperature.min}`
       break;
-    },
-    case 'yah': {
-      let responseMessage = `Yah, it\'s going to be an awesome beach day! It's going to be ${icon}, and feel like ${apparentTemp.toFixed()} Get out there`
+    case 'yah':
+      responseMessage = `Yah, it\'s going to be an awesome beach day! It's going to be ${summary} It\'s going to feel like ${apparentTemperature.max} Get out there`
       break;
-    },
-    default: {
-      let responseMessage = `Nah, better sit this one out. It's going to be ${icon}, and feel like ${apparentTemp.toFixed()}. Watch a movie or something`
+    default:
+      responseMessage = `Nah, better sit this one out. It's going to be ${summary} It\'s going to feel like ${apparentTemperature.min}. Watch a movie or something`
       break;
-    }
   }
 
   return responseMessage

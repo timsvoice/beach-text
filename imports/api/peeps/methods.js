@@ -33,9 +33,10 @@ export const updateMessage = new ValidatedMethod({
   name: 'update.message',
   validate: null,
   run({ number, message }) {
+    console.log(number);
     Peeps.update({ number: number }, {
       $set: {
-        next_message: message
+        'request.next_message': message
       }
     })
   }

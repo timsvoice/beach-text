@@ -25,11 +25,10 @@ Peeps.schema = new SimpleSchema({
   },
   'request': {
     type: Object,
-    optional: true
+    defaultValue: { next_message: '' },
   },
   'request.beach': {
-    type: Object,
-    optional: true,
+    type: Object,    
   },
   'request.beach.lat': {
     type: String,
@@ -45,7 +44,6 @@ Peeps.schema = new SimpleSchema({
   },
   'request.next_message': {
     type: String,
-    optional: true,
     defaultValue: '',
   },  
 })

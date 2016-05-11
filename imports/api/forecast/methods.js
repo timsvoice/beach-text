@@ -3,6 +3,7 @@ import { ValidatedMethod } from 'meteor/mdg:validated-method';
 import Future from 'fibers/future';
 
 import Forecast from 'forecast.io';
+import moment from 'moment';
 
 const options = { APIKey: Meteor.settings.FORECAST_KEY };
 const forecast = new Forecast(options);
@@ -12,9 +13,10 @@ export const getForecast = new ValidatedMethod({
   name: 'forecast.get',
   validate: null,
   run({ lat, lng }) {
-    const forecastOptions = { exclude: 'minutely,hourly,flags,alerts' };
+    const forecastOptions = { exclude: 'minutely,flags,alerts' };
     forecast.get(lat, lng, forecastOptions, (err, res, data) => {
       if (err) future.return(err);
+      console.log(data);
       future.return(data);
     });
     return future.wait();
@@ -27,21 +29,24 @@ export const getBeachForecast = new ValidatedMethod({
   run({ day, lat, lng }) {
     const data = getForecast.call({ lat, lng });
     const dailyData = data.daily.data;
+    const hourlyData = data.hourly.data;
+    let dailyForecast = { };
 
-    const data = dailyData.forEach((daily) => {
-      dayName = moment(daily.time).format('dddd').toLowerCase()
-      if (day === dayName) {
-        return daily;
+    dailyData.forEach((daily) => {
+      let dayName = moment.unix(daily.time).format('dddd').toLowerCase();
+      if (day == dayName) {        
+        dailyForecast = daily;
       }
     })
 
     const beachForecast = {
-      summary: hourlyData.summary,
-      current: currentData.summary,
-      temperature: currentData.apparentTemperature,
-      cloudCover: currentData.cloudCover,
-      precipProbability: currentData.precipProbability,
+      icon: dailyForecast.icon,
+      summary: dailyForecast.summary,
+      temperature: { min: dailyForecast.apparentTemperatureMin, max: dailyForecast.apparentTemperatureMax },
+      cloudCover: dailyForecast.cloudCover,
+      precipProbability: dailyForecast.precipProbability,
     };
+
     return beachForecast;
   },
 });

@@ -11,6 +11,7 @@
     "forecast.io": "0.0.9",
     "foundation-sites": "^6.2.1",
     "meteor-node-stubs": "^0.2.3",
+    "moment": "^2.13.0",
     "twilio": "^2.9.1"
   },
   "devDependencies": {
